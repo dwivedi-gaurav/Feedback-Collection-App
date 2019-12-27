@@ -9,7 +9,8 @@ const User=mongoose.model('user');
 passport.use(new GoogleStrategy({
     clientID:keys.googleClientID,
     clientSecret:keys.googleClientSecret,
-    callbackURL:'/auth/google/callback'    //route to which user will be sent after granting permission on consent screen
+    callbackURL:'/auth/google/callback',    //route to which user will be sent after granting permission on consent screen
+    proxy:true
 },(accessToken,refreshToken,profile,done)=>{                        //This callback gets called when google replies with the user data.
     User.findOne({googleId:profile.id}).then((user)=>{
         console.log(user);
