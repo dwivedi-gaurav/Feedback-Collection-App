@@ -11,19 +11,14 @@ passport.use(new GoogleStrategy({
     clientSecret:keys.googleClientSecret,
     callbackURL:'/auth/google/callback',    //route to which user will be sent after granting permission on consent screen
     proxy:true
-},(accessToken,refreshToken,profile,done)=>{                        //This callback gets called when google replies with the user data.
-    User.findOne({googleId:profile.id}).then((user)=>{
-        console.log(user);
-        if(!user){
-            new User({googleId:profile.id}).save().then((user)=>{
-                done(null,user);
-            });
-        }else{
-            done(null,user);
-        }
-    }).catch((err)=>{
-        console.log(err);
-    });
+},async (accessToken,refreshToken,profile,done)=>{                        //This callback gets called when google replies with the user data.
+    const existingUser=await User.findOne({googleId:profile.id});
+    if(!existingUser){
+        const newUser= await new User({googleId:profile.id}).save();
+        done(null,newUser);
+    }else{
+        done(null,existingUser);
+    }
 }));
 
 passport.serializeUser((user,done)=>{
